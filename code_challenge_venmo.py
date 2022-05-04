@@ -29,6 +29,10 @@ import unittest
 import uuid
 
 
+class UserException(Exception):
+    pass
+
+
 class UsernameException(Exception):
     pass
 
@@ -283,6 +287,32 @@ class TestUser(unittest.TestCase):
 
         for idx, feed_item in enumerate(test_feed_items):
             self.assertEqual(feed_item, test_user_feed[ idx ])
+
+    def test_add_friend(self):
+        alice = User("Alice")
+        carol = User("Carol")
+
+        self.assertEqual(len(alice.friends), 0)
+
+        alice.add_friend(carol)
+        self.assertEqual(len(carol.friends), 0)
+        self.assertEqual(len(alice.friends), 1)
+        self.assertIn(carol.id, alice.friends)
+
+    def test_add_friend_failures(self):
+        alice = User("Alice")
+        carol = User("Carol")
+
+        with self.assertRaises(UserException) as exception1:
+            alice.add_friend(alice)
+
+        self.assertTrue("User cannot add themselves as a friend." in str(exception1.exception))
+
+        with self.assertRaises(UserException) as exception2:
+            alice.add_friend(carol)
+            alice.add_friend(carol)
+
+        self.assertTrue(f"User ID {alice.id} is already friends with {carol.id}." in str(exception2.exception))
 
 class TestMiniVenmo(unittest.TestCase):
 
