@@ -155,10 +155,8 @@ class MiniVenmo:
         return new_user
 
     def render_feed(self, feed):
-        # Bobby paid Carol $5.00 for Coffee
-        # Carol paid Bobby $15.00 for Lunch
-        # TODO: add code here
-        pass
+        for item in feed:
+            print(item)
 
     @classmethod
     def run(cls):
