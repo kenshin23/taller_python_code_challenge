@@ -83,8 +83,8 @@ class User:
             raise UserException(f'User ID {self.id} is already friends with {new_friend.id}.')
 
         self.friends.append(new_friend.id)
-        self.add_to_activity(f'{self.username} added {new_friend.username} as a friend.')
-        new_friend.add_to_activity(f'{self.username} added you as a friend.')
+        self.add_to_activity({"sender_username": self.username, "recipient_username": new_friend.username, "type": "friend_request"})
+        new_friend.add_to_activity({"sender_username": self.username, "recipient_username": new_friend.username, "type": "friend_request"})
 
         return new_friend.id
 
