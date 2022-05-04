@@ -171,6 +171,16 @@ class TestMiniVenmo(unittest.TestCase):
         self.assertEqual(carlos_user_details["balance"], carlos_user.balance)
         self.assertEqual(carlos_user_details["credit_card_number"], carlos_user.credit_card_number)
 
+    def test_create_user_fail(self):
+        wrong_user_details = {
+            "username": "Car",  # Will fail because the username is too short.
+            "balance": 23.00,
+            "credit_card_number": "4111111111111111",
+        }
+        mv = MiniVenmo()
+        with self.assertRaises(UsernameException):
+            mv.create_user(**wrong_user_details)
+
 
 if __name__ == "__main__":
     unittest.main()
