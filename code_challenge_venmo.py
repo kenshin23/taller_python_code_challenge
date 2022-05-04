@@ -54,6 +54,7 @@ class User:
     def __init__(self, username):
         self.credit_card_number = None
         self.balance = 0.0
+        self.activity = []
 
         if self._is_valid_username(username):
             self.username = username
