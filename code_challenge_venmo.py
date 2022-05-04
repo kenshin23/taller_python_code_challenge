@@ -56,9 +56,11 @@ class Payment:
 
 class User:
     def __init__(self, username):
+        self.id = str(uuid.uuid4())
         self.credit_card_number = None
         self.balance = 0.0
         self.activity = []
+        self.friends = []
 
         if self._is_valid_username(username):
             self.username = username
@@ -73,8 +75,15 @@ class User:
         return self.activity
 
     def add_friend(self, new_friend):
-        # TODO: add code here
-        pass
+        if new_friend == self:
+            raise UserException('User cannot add themselves as a friend.')
+
+        if new_friend.id in self.friends:
+            raise UserException(f'User ID {self.id} is already friends with {new_friend.id}.')
+
+        self.friends.append(new_friend.id)
+
+        return new_friend.id
 
     def add_to_balance(self, amount):
         self.balance += float(amount)
