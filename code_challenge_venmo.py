@@ -310,6 +310,9 @@ class TestMiniVenmo(unittest.TestCase):
         with self.assertRaises(UsernameException):
             mv.create_user(**wrong_user_details)
 
+    def test_functionality(self):
+        mv = MiniVenmo()
+        mv.run()
 
 if __name__ == "__main__":
     unittest.main()
