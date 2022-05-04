@@ -271,6 +271,22 @@ class TestUser(unittest.TestCase):
         alice.add_to_activity(message)
         self.assertIn(message, alice.activity)
 
+    def test_retrieve_feed(self):
+        test_user = User('TestUser')
+        test_feed_items = [
+            'TestUser registered on 2022-05-05',
+            'TestUser added Interviewer as a friend'
+            'TestUser paid Wife $5.00 for Lunch',
+        ]
+        for feed_item in test_feed_items:
+            test_user.add_to_activity(feed_item)
+
+        test_user_feed =  test_user.retrieve_feed()
+        self.assertCountEqual(test_feed_items, test_user_feed)
+
+        for idx, feed_item in enumerate(test_feed_items):
+            self.assertEqual(feed_item, test_user_feed[ idx ])
+
 class TestMiniVenmo(unittest.TestCase):
 
     def test_create_user(self):
