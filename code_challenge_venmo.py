@@ -60,6 +60,10 @@ class User:
         else:
             raise UsernameException("Username not valid.")
 
+    def add_to_activity(self, message):
+        self.activity.append(message)
+
+    # NOTE: This is called 'retrieve_activity' in the question details above.
     def retrieve_feed(self):
         # TODO: add code here
         return []
@@ -260,6 +264,11 @@ class TestUser(unittest.TestCase):
 
         self.assertTrue("User cannot pay themselves." in str(exception3.exception))
 
+    def test_add_activity(self):
+        alice = User('Alice')
+        message = 'Alice has registered in Venmo'
+        alice.add_to_activity(message)
+        self.assertIn(message, alice.activity)
 
 class TestMiniVenmo(unittest.TestCase):
 
