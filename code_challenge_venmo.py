@@ -157,5 +157,20 @@ class TestUser(unittest.TestCase):
             raise UsernameException()
 
 
+class TestMiniVenmo(unittest.TestCase):
+
+    def test_create_user(self):
+        carlos_user_details = {
+            "username": "Carlos",
+            "balance": 23.00,
+            "credit_card_number": "4111111111111111",
+        }
+        mv = MiniVenmo()
+        carlos_user = mv.create_user(**carlos_user_details)
+        self.assertEqual(carlos_user_details["username"], carlos_user.username)
+        self.assertEqual(carlos_user_details["balance"], carlos_user.balance)
+        self.assertEqual(carlos_user_details["credit_card_number"], carlos_user.credit_card_number)
+
+
 if __name__ == "__main__":
     unittest.main()
