@@ -162,6 +162,83 @@ class TestUser(unittest.TestCase):
         with self.assertRaises(UsernameException):
             raise UsernameException()
 
+    def test_pay_with_balance_success(self):
+        alice = User("Alice")
+        alice.add_to_balance(5.00)
+
+        bobby = User("Bobby")
+        bobby.add_to_balance(10.00)
+
+        alice.pay_with_balance(bobby, 5.00, "Present")
+        self.assertEqual(alice.balance, 0.00)
+        self.assertEqual(bobby.balance, 15.00)
+
+    def test_pay_with_balance_failure(self):
+        alice = User("Alice")
+        alice.add_to_balance(5.00)
+
+        bobby = User("Bobby")
+        bobby.add_to_balance(10.00)
+
+        with self.assertRaises(PaymentException) as exception1:
+            alice.pay_with_balance(alice, 1.00, "Savings")
+
+        self.assertTrue("User cannot pay themselves." in str(exception1.exception))
+
+        with self.assertRaises(PaymentException) as exception2:
+            alice.pay_with_balance(bobby, -15.00, "Dinner")
+
+        self.assertTrue("Amount must be a non-negative number." in str(exception2.exception))
+
+        with self.assertRaises(PaymentException) as exception3:
+            alice.pay_with_balance(bobby, 15.00, "Dinner")
+
+        self.assertTrue("Insufficient balance to make payment." in str(exception3.exception))
+
+    def test_pay_success(self):
+        alice = User("Alice")
+        alice.add_credit_card("4111111111111111")
+        alice.add_to_balance(5.00)
+
+        bobby = User("Bobby")
+        bobby.add_credit_card("4242424242424242")
+        bobby.add_to_balance(10.00)
+
+        # Pay Bob with balance:
+        alice.pay(bobby, 5.00, "Present")
+        self.assertEqual(alice.balance, 0.00)
+        self.assertEqual(bobby.balance, 15.00)
+
+        # Pay Alice with credit card:
+        bobby.pay(alice, 30.00, "Shoes")
+        self.assertEqual(bobby.balance, 15.00)
+        self.assertEqual(alice.balance, 30.00)
+        
+    def test_pay_failures(self):
+        alice = User("Alice")
+        alice.add_to_balance(5.00)
+
+        bobby = User("Bobby")
+        bobby.add_credit_card("4242424242424242")
+        bobby.add_to_balance(10.00)
+
+        # Must raise a PaymentException because the user doesn't have enough balance,
+        # and also doesn't have a credit card:
+        with self.assertRaises(PaymentException) as exception1:
+            alice.pay(bobby, 15.00, "Dinner")
+
+        self.assertTrue("Must have a credit card to make a payment." in str(exception1.exception))
+
+        with self.assertRaises(PaymentException) as exception2:
+            alice.pay(bobby, -15.00, "Dinner")
+
+        self.assertTrue("Amount must be a non-negative number." in str(exception2.exception))
+
+        with self.assertRaises(PaymentException) as exception3:
+            alice.pay(alice, 15.00, "Dinner")
+
+        self.assertTrue("User cannot pay themselves." in str(exception3.exception))
+
 
 class TestMiniVenmo(unittest.TestCase):
 
