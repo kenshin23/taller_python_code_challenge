@@ -5,7 +5,9 @@ This is a code challenge presented to me for a Python Developer role.
 # Problem statement
 
 MiniVenmo! Imagine that your phone and wallet are trying to have a beautiful baby.
+
 In order to make this happen, you must write a social payment app.
+
 Implement a program that will feature users, credit cards, and payment feeds.
 
 # Questions / Tasks
@@ -26,6 +28,8 @@ Implement a program that will feature users, credit cards, and payment feeds.
 
 # My approach
 
-I'm trying to enforce TDD (Test Driven Development) in the code that I write, so I will mostly start of with tests of my code, then the actual code that passes those tests.
+I'm trying to enforce TDD (Test Driven Development) in the code that I write, so I will mostly start off with tests of my code, then the actual code that passes those tests.
+
 Whenever there's a change in functionality, I'll write the new test cases, then adapt the code to make those tests pass.
+
 I tried not to get ahead of myself and add features before the tests. Hopefully the commit history serves as a way into my thought process.
