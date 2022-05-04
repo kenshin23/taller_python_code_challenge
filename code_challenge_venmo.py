@@ -24,6 +24,7 @@ baby. In order to make this happen, you must write a social payment app.
 Implement a program that will feature users, credit cards, and payment feeds.
 """
 
+import datetime
 import re
 import unittest
 import uuid
@@ -169,9 +170,27 @@ class MiniVenmo:
 
         return new_user
 
-    def render_feed(self, feed):
+    def render_feed(self, feed, print_feed=True) -> list:
+        rendered_feed = []
         for item in feed:
-            print(item)
+            template = None
+            if item["type"] == "payment":
+                template = f'{item["sender_username"]} paid {item["recipient_username"]} ${item["amount"]:.2f} for {item["note"]}.'
+
+            elif item["type"] == 'friend_request':
+                template = f'{item["sender_username"]} added {item["recipient_username"]} as a friend'
+
+            elif item["type"] == "registration":
+                template = f'{item["sender_username"]} registered on {item["date"]}'
+
+            else:
+                template = 'Unsupported message type.'
+
+            rendered_feed.append(template)
+            if print_feed:
+                print(template)
+
+        return rendered_feed
 
     @classmethod
     def run(cls):
@@ -285,19 +304,40 @@ class TestUser(unittest.TestCase):
 
     def test_retrieve_feed(self):
         test_user = User('TestUser')
+        interviewer = User('Interviewer')
+        wife = User('Wife')
+
         test_feed_items = [
-            'TestUser registered on 2022-05-05',
-            'TestUser added Interviewer as a friend'
-            'TestUser paid Wife $5.00 for Lunch',
+            {
+                "message_object": {
+                    "sender_username": test_user.username,
+                    "recipient_username": None,
+                    "type": "registration",
+                    "date": datetime.datetime(2022, 5, 5).strftime("%Y-%m-%d")
+                }
+            },
+            {
+                "message_object": {
+                    "sender_username": test_user.username,
+                    "recipient_username": interviewer.username,
+                    "type": "friend_request",
+                }
+            },
+            {
+                "message_object": {
+                    "sender_username": test_user.username,
+                    "recipient_username": wife.username,
+                    "type": "payment",
+                    "amount": 5.00,
+                    "note": "Lunch",
+                }
+            },
         ]
         for feed_item in test_feed_items:
-            test_user.add_to_activity(feed_item)
+            test_user.add_to_activity(feed_item["message_object"])
 
-        test_user_feed =  test_user.retrieve_feed()
-        self.assertCountEqual(test_feed_items, test_user_feed)
-
-        for idx, feed_item in enumerate(test_feed_items):
-            self.assertEqual(feed_item, test_user_feed[ idx ])
+        test_user_feed = test_user.retrieve_feed()
+        self.assertCountEqual([item["message_object"] for item in test_feed_items], test_user_feed)
 
     def test_add_friend(self):
         alice = User("Alice")
@@ -348,6 +388,50 @@ class TestMiniVenmo(unittest.TestCase):
         mv = MiniVenmo()
         with self.assertRaises(UsernameException):
             mv.create_user(**wrong_user_details)
+
+    def test_render_feed(self):
+        test_user = User('TestUser')
+        interviewer = User('Interviewer')
+        wife = User('Wife')
+
+        test_feed_items = [
+            {
+                "expected": "TestUser registered on 2022-05-05",
+                "message_object": {
+                    "sender_username": test_user.username,
+                    "recipient_username": None,
+                    "type": "registration",
+                    "date": datetime.datetime(2022, 5, 5).strftime("%Y-%m-%d")
+                }
+            },
+            {
+                "expected": "TestUser added Interviewer as a friend",
+                "message_object": {
+                    "sender_username": test_user.username,
+                    "recipient_username": interviewer.username,
+                    "type": "friend_request",
+                }
+            },
+            {
+                "expected": "TestUser paid Wife $5.00 for Lunch.",
+                "message_object": {
+                    "sender_username": test_user.username,
+                    "recipient_username": wife.username,
+                    "type": "payment",
+                    "amount": 5.00,
+                    "note": "Lunch",
+                }
+            },
+        ]
+        for feed_item in test_feed_items:
+            test_user.add_to_activity(feed_item["message_object"])
+
+        test_user_feed = test_user.retrieve_feed()
+
+        mv = MiniVenmo()
+        rendered = mv.render_feed(test_user_feed, print_feed=False)
+
+        self.assertCountEqual([item["expected"] for item in test_feed_items], rendered)
 
     def test_functionality(self):
         mv = MiniVenmo()
